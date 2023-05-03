@@ -15,27 +15,16 @@ import * as colors from 'styles/colors'
 import {Textarea} from 'components/lib'
 import {Rating} from 'components/rating'
 import {StatusButtons} from 'components/status-buttons'
-import bookPlaceholderSvg from 'assets/book-placeholder.svg'
-
-const loadingBook = {
-  title: 'Loading...',
-  author: 'loading...',
-  coverImageUrl: bookPlaceholderSvg,
-  publisher: 'Loading Publishing',
-  synopsis: 'Loading...',
-  loadingBook: true,
-}
+import {useBook} from 'utils/books.exercise'
 
 function BookScreen({user}) {
   const {bookId} = useParams()
-  const {data: book = loadingBook} = useQuery({
-    queryKey: ['book', {bookId}],
-    queryFn: () => client(`books/${bookId}`, {token: user.token}).then(data => data.book)
-  })
+  const book = useBook({bookId, user})
 
   const {data: listItems} = useQuery({
-    queryKey: "list-items",
-    queryFn: () => client('list-items', {token: user.token}).then(data => data.listItems)
+    queryKey: 'list-items',
+    queryFn: () =>
+      client('list-items', {token: user.token}).then(data => data.listItems),
   })
   const listItem = listItems?.find(li => li.bookId === bookId) ?? null
 
@@ -127,9 +116,17 @@ function NotesTextarea({listItem, user}) {
   //   you can pass as data.
   // 💰 if you want to get the list-items cache updated after this query finishes
   // then use the `onSettled` config option to queryCache.invalidateQueries('list-items')
-  const [update] = useMutation(updates => client(`list-items/${listItem.id}`, {token: user.token, method: "PUT", data: updates}), {
-    onSettled: () => queryCache.invalidateQueries('list-items')
-  })
+  const [update] = useMutation(
+    updates =>
+      client(`list-items/${listItem.id}`, {
+        token: user.token,
+        method: 'PUT',
+        data: updates,
+      }),
+    {
+      onSettled: () => queryCache.invalidateQueries('list-items'),
+    },
+  )
   // 💣 DELETE THIS ESLINT IGNORE!! Don't ignore the exhaustive deps rule please
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedMutate = React.useMemo(
