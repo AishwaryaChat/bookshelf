@@ -12,7 +12,8 @@ export const useListItems = ({user}) => {
 
 export const useListItem = ({user, bookId}) => {
   const listItems = useListItems({user})
-  return listItems?.find(li => li.id === bookId) ?? null
+  const listItem = listItems?.find(li => li.bookId === bookId) ?? null
+  return listItem
 }
 
 const defaultMutationOptions = {
@@ -41,3 +42,14 @@ export const useRemoveListItem = ({user}) => {
     defaultMutationOptions,
   )
 }
+
+export const useCreateListItem = ({user}) =>
+  useMutation(
+    ({bookId}) =>
+      client(`list-items`, {
+        token: user.token,
+        method: 'POST',
+        data: {bookId},
+      }),
+    defaultMutationOptions,
+  )
