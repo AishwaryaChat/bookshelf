@@ -96,7 +96,6 @@ function StatusButtons({user, book}) {
   }), {
     onSettled: () => queryCache.invalidateQueries('list-items')
   })
-  console.log("listItem inside exxercise", listItem)
   return (
     <React.Fragment>
       {listItem ? (
