@@ -69,7 +69,7 @@ function StatusButtons({user, book}) {
   // the mutate function should call the list-items/:listItemId endpoint with a PUT
   //   and the updates as data. The mutate function will be called with the updates
   //   you can pass as data.
-  const [update] = useMutation(updates => client(`list-items/:${updates.id}`, {
+  const [update] = useMutation(updates => client(`list-items/${updates.id}`, {
     token: user.token,
     method: "PUT",
     data: updates
