@@ -21,9 +21,13 @@ import {
 } from 'utils/list-items.exercise'
 
 function TooltipButton({label, highlight, onClick, icon, ...rest}) {
-  const {isLoading, isError, error, run} = useAsync()
+  const {isLoading, isError, error, run, reset} = useAsync()
 
   function handleClick() {
+    if(isError) {
+      reset()
+      return
+    }
     run(onClick())
   }
 
