@@ -15,14 +15,13 @@ import {Textarea} from 'components/lib'
 import {Rating} from 'components/rating'
 import {StatusButtons} from 'components/status-buttons'
 import {useBook} from 'utils/books.exercise'
-import { useListItems } from 'utils/list-items.exercise'
+import {useListItem} from 'utils/list-items.exercise'
 
 function BookScreen({user}) {
   const {bookId} = useParams()
   const book = useBook({bookId, user})
 
-  const listItems = useListItems({user})
-  const listItem = listItems?.find(li => li.bookId === bookId) ?? null
+  const listItem = useListItem({user, bookId})
 
   const {title, author, coverImageUrl, publisher, synopsis} = book
 
