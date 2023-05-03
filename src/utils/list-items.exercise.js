@@ -1,4 +1,4 @@
-import {useQuery} from 'react-query'
+import {useQuery, queryCache, useMutation} from 'react-query'
 import {client} from './api-client.exercise'
 
 export const useListItems = ({user}) => {
@@ -7,10 +7,26 @@ export const useListItems = ({user}) => {
     queryFn: () =>
       client('list-items', {token: user.token}).then(data => data.listItems),
   })
-  return listItems
+  return listItems ?? []
 }
 
 export const useListItem = ({user, bookId}) => {
   const listItems = useListItems({user})
   return listItems?.find(li => li.id === bookId) ?? null
+}
+
+const defaultMutationOptions = {
+  onSettled: () => queryCache.invalidateQueries('list-items'),
+}
+
+export const useUpdateListItem = ({user}) => {
+  return useMutation(
+    updates =>
+      client(`list-items/${updates.id}`, {
+        token: user.token,
+        method: 'PUT',
+        data: updates,
+      }),
+    defaultMutationOptions,
+  )
 }
