@@ -22,6 +22,13 @@ const getBookSearchConfig = ({query, user}) => ({
     client(`books?query=${encodeURIComponent(query)}`, {
       token: user.token,
     }).then(data => data.books),
+  config: {
+    onSuccess(books) {
+      for (let book of books) {
+        setQueryDataForBook(book)
+      }
+    },
+  },
 })
 
 export const useBook = ({bookId, user}) => {
@@ -43,4 +50,8 @@ export const useBookSearch = ({query, user}) => {
 export const refetchBookSearchQuery = ({user}) => {
   queryCache.removeQueries('bookSearch')
   queryCache.prefetchQuery(getBookSearchConfig({query: '', user}))
+}
+
+export const setQueryDataForBook = book => {
+  queryCache.setQueryData(['book', {bookId: book.id}], book)
 }
