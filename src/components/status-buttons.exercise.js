@@ -10,12 +10,16 @@ import {
   FaTimesCircle,
 } from 'react-icons/fa'
 import Tooltip from '@reach/tooltip'
-import { useMutation, queryCache } from 'react-query'
+import {useMutation, queryCache} from 'react-query'
 import {useAsync} from 'utils/hooks'
 import * as colors from 'styles/colors'
 import {CircleButton, Spinner} from './lib'
-import { client } from 'utils/api-client.exercise'
-import { useListItem } from 'utils/list-items.exercise'
+import {client} from 'utils/api-client.exercise'
+import {
+  useListItem,
+  useRemoveListItem,
+  useUpdateListItem,
+} from 'utils/list-items.exercise'
 
 function TooltipButton({label, highlight, onClick, icon, ...rest}) {
   const {isLoading, isError, error, run} = useAsync()
@@ -50,28 +54,21 @@ function TooltipButton({label, highlight, onClick, icon, ...rest}) {
 
 function StatusButtons({user, book}) {
   const listItem = useListItem({user, bookId: book.id})
-  const [update] = useMutation(updates => client(`list-items/${updates.id}`, {
-    token: user.token,
-    method: "PUT",
-    data: updates
-  }), {
-    onSettled: () => queryCache.invalidateQueries('list-items')
-  })
+  const [update] = useUpdateListItem({user})
 
-  const [remove] = useMutation(({id}) => client(`list-items/${id}`, {
-    token: user.token,
-    method: "DELETE",
-  }), {
-    onSettled: () => queryCache.invalidateQueries('list-items')
-  })
+  const [remove] = useRemoveListItem(user)
 
-  const [create] = useMutation(({bookId}) => client(`list-items`, {
-    token: user.token,
-    method: "POST",
-    data: {bookId}
-  }), {
-    onSettled: () => queryCache.invalidateQueries('list-items')
-  })
+  const [create] = useMutation(
+    ({bookId}) =>
+      client(`list-items`, {
+        token: user.token,
+        method: 'POST',
+        data: {bookId},
+      }),
+    {
+      onSettled: () => queryCache.invalidateQueries('list-items'),
+    },
+  )
   return (
     <React.Fragment>
       {listItem ? (
@@ -79,7 +76,7 @@ function StatusButtons({user, book}) {
           <TooltipButton
             label="Unmark as read"
             highlight={colors.yellow}
-            onClick={()=> update({id: listItem.id, finishDate: null})}
+            onClick={() => update({id: listItem.id, finishDate: null})}
             icon={<FaBook />}
           />
         ) : (

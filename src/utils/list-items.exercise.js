@@ -30,3 +30,14 @@ export const useUpdateListItem = ({user}) => {
     defaultMutationOptions,
   )
 }
+
+export const useRemoveListItem = ({user}) => {
+  return useMutation(
+    ({id}) =>
+      client(`list-items/${id}`, {
+        token: user.token,
+        method: 'DELETE',
+      }),
+    defaultMutationOptions,
+  )
+}
